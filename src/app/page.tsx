@@ -85,7 +85,7 @@ export default function AuthPage() {
             <MessageSquare className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-100 flex items-center gap-2">
-            AetherChat <Sparkles className="w-5 h-5 text-teal-400" />
+            TimyleChat <Sparkles className="w-5 h-5 text-teal-400" />
           </h1>
           <p className="text-sm text-slate-400 mt-2">
             Trò chuyện thời gian thực với trải nghiệm tối dịu mắt
@@ -99,22 +99,20 @@ export default function AuthPage() {
             <button
               type="button"
               onClick={() => { setIsLogin(true); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`py-2 text-sm font-semibold rounded-xl transition-all duration-300 ${
-                isLogin
+              className={`py-2 text-sm font-semibold rounded-xl transition-all duration-300 ${isLogin
                   ? 'bg-slate-800 text-teal-400 shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
-              }`}
+                }`}
             >
               Đăng nhập
             </button>
             <button
               type="button"
               onClick={() => { setIsLogin(false); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`py-2 text-sm font-semibold rounded-xl transition-all duration-300 ${
-                !isLogin
+              className={`py-2 text-sm font-semibold rounded-xl transition-all duration-300 ${!isLogin
                   ? 'bg-slate-800 text-teal-400 shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
-              }`}
+                }`}
             >
               Đăng ký
             </button>

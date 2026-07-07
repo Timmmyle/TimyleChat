@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AetherChat - Trải nghiệm Chat Tối Dịu Mắt",
+  title: "TimylerChat - Trải nghiệm Chat Tối Dịu Mắt",
   description: "Ứng dụng trò chuyện thời gian thực tuyệt đẹp xây dựng bằng Next.js, Tailwind v4 và Supabase",
 };
 
