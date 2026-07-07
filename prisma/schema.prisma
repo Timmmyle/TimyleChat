@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RoomType {
+  DIRECT
+  GROUP
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model User {
+  id                  String       @id // Ánh xạ từ Supabase Auth User ID (UUID)
+  email               String       @unique
+  username            String?
+  avatarUrl           String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  memberships         RoomMember[]
+  messages            Message[]
+
+  // Bạn bè
+  sentFriendships     Friendship[] @relation("SentFriendships")
+  receivedFriendships Friendship[] @relation("ReceivedFriendships")
+}
+
+model Friendship {
+  id         String           @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     FriendshipStatus @default(PENDING)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  sender   User @relation("SentFriendships", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedFriendships", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+}
+
+model Room {
+  id        String       @id @default(uuid())
+  name      String?      // Tên phòng (chỉ dùng cho Group chat, null đối với Direct 1-1)
+  type      RoomType     @default(DIRECT)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  members   RoomMember[]
+  messages  Message[]
+}
+
+model RoomMember {
+  id       String   @id @default(uuid())
+  userId   String
+  roomId   String
+  joinedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roomId])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  roomId    String
+  senderId  String
+  createdAt DateTime @default(now())
+
+  fileUrl   String?  // URL tệp đính kèm
+  fileName  String?  // Tên tệp đính kèm
+  fileType  String?  // Loại tệp ('image' | 'file')
+
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+}
