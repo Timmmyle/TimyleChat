@@ -1,7 +1,6 @@
 'use server'
 
 import prisma from '@/lib/prisma'
-import { RoomType, FriendshipStatus } from '@prisma/client'
 
 // Đồng bộ User từ Supabase Auth sang Prisma Database
 export async function syncUser(id: string, email: string, username?: string, avatarUrl?: string) {
@@ -63,8 +62,8 @@ export async function getFriends(userId: string) {
     const friendships = await prisma.friendship.findMany({
       where: {
         OR: [
-          { senderId: userId, status: FriendshipStatus.ACCEPTED },
-          { receiverId: userId, status: FriendshipStatus.ACCEPTED }
+          { senderId: userId, status: 'ACCEPTED' },
+          { receiverId: userId, status: 'ACCEPTED' }
         ]
       },
       include: {
@@ -90,7 +89,7 @@ export async function getPendingRequests(userId: string) {
     const incoming = await prisma.friendship.findMany({
       where: {
         receiverId: userId,
-        status: FriendshipStatus.PENDING
+        status: 'PENDING'
       },
       include: {
         sender: true
@@ -100,7 +99,7 @@ export async function getPendingRequests(userId: string) {
     const outgoing = await prisma.friendship.findMany({
       where: {
         senderId: userId,
-        status: FriendshipStatus.PENDING
+        status: 'PENDING'
       },
       include: {
         receiver: true
@@ -146,10 +145,10 @@ export async function sendFriendRequest(senderId: string, receiverEmailOrUsernam
     })
 
     if (existingFriendship) {
-      if (existingFriendship.status === FriendshipStatus.ACCEPTED) {
+      if (existingFriendship.status === 'ACCEPTED') {
         return { success: false, error: 'Hai bạn đã là bạn bè của nhau rồi!' }
       }
-      if (existingFriendship.status === FriendshipStatus.PENDING) {
+      if (existingFriendship.status === 'PENDING') {
         return { success: false, error: 'Yêu cầu kết bạn đang trong trạng thái chờ phản hồi!' }
       }
       
@@ -159,7 +158,7 @@ export async function sendFriendRequest(senderId: string, receiverEmailOrUsernam
         data: {
           senderId,
           receiverId: receiver.id,
-          status: FriendshipStatus.PENDING
+          status: 'PENDING'
         }
       })
       return { success: true, friendship: updated }
@@ -170,7 +169,7 @@ export async function sendFriendRequest(senderId: string, receiverEmailOrUsernam
       data: {
         senderId,
         receiverId: receiver.id,
-        status: FriendshipStatus.PENDING
+        status: 'PENDING'
       }
     })
 
@@ -187,7 +186,7 @@ export async function respondToFriendRequest(friendshipId: string, status: 'ACCE
     const updated = await prisma.friendship.update({
       where: { id: friendshipId },
       data: {
-        status: status === 'ACCEPTED' ? FriendshipStatus.ACCEPTED : FriendshipStatus.DECLINED
+        status
       }
     })
     return { success: true, friendship: updated }
@@ -244,7 +243,7 @@ export async function createRoom(
     if (type === 'DIRECT' && allMemberIds.length === 2) {
       const existingRooms = await prisma.room.findMany({
         where: {
-          type: RoomType.DIRECT,
+          type: 'DIRECT',
           members: {
             every: {
               userId: { in: allMemberIds },
@@ -267,7 +266,7 @@ export async function createRoom(
     const room = await prisma.room.create({
       data: {
         name: type === 'GROUP' ? name || 'Nhóm mới' : null,
-        type: type === 'DIRECT' ? RoomType.DIRECT : RoomType.GROUP,
+        type,
         members: {
           create: allMemberIds.map((userId) => ({
             userId,
