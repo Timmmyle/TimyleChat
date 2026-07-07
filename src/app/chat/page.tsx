@@ -39,7 +39,8 @@ import {
   ChevronRight,
   FileText,
   Image as ImageIcon,
-  PlusCircle
+  PlusCircle,
+  ArrowLeft
 } from 'lucide-react'
 
 interface DBUser {
@@ -645,7 +646,7 @@ export default function ChatPage() {
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[150px] pointer-events-none" />
 
       {/* 1. SIDEBAR */}
-      <aside className="w-80 border-r border-slate-900 bg-slate-950/60 backdrop-blur-xl flex flex-col h-full z-10">
+      <aside className={`w-full md:w-80 border-r border-slate-900 bg-slate-950/60 backdrop-blur-xl flex-col h-full z-10 ${selectedRoom ? 'hidden md:flex' : 'flex'}`}>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-slate-900 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -919,14 +920,22 @@ export default function ChatPage() {
       </aside>
 
       {/* 2. CHAT AREA WRAPPER */}
-      <main className="flex-1 flex overflow-hidden h-full z-10">
+      <main className={`flex-1 overflow-hidden h-full z-10 ${selectedRoom ? 'flex' : 'hidden md:flex'}`}>
         {selectedRoom ? (
           <div className="flex-1 flex overflow-hidden h-full">
             {/* Cột giữa: Cửa sổ Chat chính */}
             <div className="flex-1 flex flex-col h-full bg-slate-950/20 backdrop-blur-sm border-r border-slate-900/50">
               {/* Chat Header */}
-              <div className="h-16 border-b border-slate-900/80 px-6 flex items-center justify-between bg-slate-950/40">
+              <div className="h-16 border-b border-slate-900/80 px-4 md:px-6 flex items-center justify-between bg-slate-950/40">
                 <div className="flex items-center gap-3">
+                  {/* Nút quay lại trên mobile */}
+                  <button
+                    onClick={() => setSelectedRoom(null)}
+                    className="md:hidden p-2 hover:bg-slate-900 rounded-xl text-slate-400 hover:text-slate-200 transition mr-0.5 cursor-pointer"
+                    title="Quay lại danh sách"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
                   <div className="relative">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold ${selectedRoom.type === 'GROUP' ? 'bg-indigo-950 text-indigo-400' : 'bg-slate-800 text-teal-400'
                       }`}>
@@ -1124,7 +1133,7 @@ export default function ChatPage() {
 
             {/* Cột phải: Sidebar thông tin nhóm (Messenger style) */}
             {isInfoOpen && (
-              <aside className="w-80 border-l border-slate-900 bg-slate-950/60 backdrop-blur-xl flex flex-col h-full overflow-hidden animate-in slide-in-from-right duration-250">
+              <aside className="fixed md:relative top-0 right-0 z-40 w-full md:w-80 border-l border-slate-900 bg-slate-950 md:bg-slate-950/60 backdrop-blur-xl flex flex-col h-full overflow-hidden animate-in slide-in-from-right duration-250">
                 {/* Header sidebar thông tin */}
                 <div className="p-4 border-b border-slate-900 flex items-center justify-between">
                   <span className="font-bold text-xs text-slate-400 uppercase tracking-wider">Thông tin hội thoại</span>
